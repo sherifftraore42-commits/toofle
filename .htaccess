@@ -1,0 +1,30 @@
+# TOOFLE - Configuration Apache (XAMPP)
+# Protection en profondeur : les fichiers sensibles ne doivent jamais être servis.
+
+# --- En-têtes de sécurité ---
+<IfModule mod_headers.c>
+    Header set X-Content-Type-Options "nosniff"
+    Header set X-Frame-Options "SAMEORIGIN"
+    Header set Referrer-Policy "strict-origin-when-cross-origin"
+    Header set Permissions-Policy "geolocation=(), microphone=(), camera=()"
+</IfModule>
+
+# --- Interdire l'accès aux dossiers techniques ---
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteRule ^(includes|sql|tests)/ - [F,L]
+</IfModule>
+
+# --- Interdire l'accès direct au fichier de configuration ---
+<FilesMatch "^(config\.php|\.env|composer\.(json|lock))$">
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+    <IfModule !mod_authz_core.c>
+        Order allow,deny
+        Deny from all
+    </IfModule>
+</FilesMatch>
+
+# --- Désactiver le listage des répertoires ---
+Options -Indexes
